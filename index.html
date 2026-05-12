@@ -4,67 +4,62 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dumax FS25 - Dashboard</title>
-
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 
 body{
   min-height:100vh;
-  font-family:Arial, sans-serif;
+  font-family:Arial,Helvetica,sans-serif;
   color:white;
   background:
-    linear-gradient(rgba(5,12,7,.82),rgba(5,12,7,.92)),
-    radial-gradient(circle at top,rgba(88,213,104,.35),transparent 35%),
-    #071008;
-  padding:28px;
+    linear-gradient(rgba(4,10,6,.82),rgba(4,10,6,.95)),
+    radial-gradient(circle at top,rgba(90,255,110,.25),transparent 35%),
+    #061008;
+  padding:24px;
 }
 
 .container{
-  max-width:1200px;
+  max-width:1180px;
   margin:auto;
-  padding:38px;
-  border-radius:26px;
-  border:1px solid rgba(125,255,138,.22);
-  background:rgba(8,18,12,.88);
+  padding:34px;
+  border-radius:24px;
+  border:1px solid rgba(126,255,140,.25);
+  background:rgba(8,20,13,.9);
   box-shadow:0 25px 90px rgba(0,0,0,.7);
 }
 
-.header{
-  text-align:center;
-  margin-bottom:35px;
-}
+.header{text-align:center;margin-bottom:34px}
 
 .logo{
-  width:260px;
-  max-width:80%;
+  width:300px;
+  max-width:85%;
   height:auto;
-  object-fit:contain;
-  margin-bottom:18px;
-  filter:drop-shadow(0 0 28px rgba(88,213,104,.45));
+  margin-bottom:16px;
+  filter:drop-shadow(0 0 28px rgba(105,255,110,.45));
 }
 
 h1{
-  font-size:54px;
+  font-size:56px;
   color:#7cff6f;
   text-transform:uppercase;
   letter-spacing:2px;
-  margin-bottom:10px;
 }
 
 .subtitle{
+  margin-top:10px;
   color:#dce8dc;
   font-size:18px;
   text-transform:uppercase;
 }
 
-.online{
+.status-pill{
   display:inline-flex;
   align-items:center;
   gap:10px;
   margin-top:22px;
   padding:10px 20px;
   border-radius:999px;
-  background:rgba(76,175,80,.13);
+  background:rgba(76,175,80,.14);
   color:#7cff6f;
   font-weight:bold;
 }
@@ -78,16 +73,26 @@ h1{
 }
 
 .refresh{
-  margin-top:18px;
+  margin-top:16px;
   color:#cfd8cf;
   font-size:14px;
 }
+
+.loading,.error{
+  margin-top:22px;
+  padding:18px;
+  border-radius:16px;
+  text-align:center;
+}
+
+.loading{background:rgba(76,175,80,.12);color:#caffd0}
+.error{display:none;background:rgba(255,80,80,.13);color:#ffb7b7}
 
 .stats{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
   gap:18px;
-  margin-top:35px;
+  margin-top:32px;
 }
 
 .card{
@@ -95,8 +100,7 @@ h1{
   padding:24px;
   border-radius:18px;
   border:1px solid rgba(255,255,255,.10);
-  background:linear-gradient(145deg,rgba(25,42,29,.9),rgba(8,15,10,.95));
-  box-shadow:inset 0 0 30px rgba(125,255,138,.035);
+  background:linear-gradient(145deg,rgba(24,43,28,.92),rgba(8,15,10,.96));
 }
 
 .card-title{
@@ -147,6 +151,28 @@ h1{
 .label{color:#d7e0d7}
 .value{text-align:right;color:white;font-weight:bold;word-break:break-word}
 
+.mods-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:10px;
+}
+
+.mod{
+  padding:12px;
+  border-radius:12px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.07);
+  color:#e8f5e8;
+  font-size:14px;
+}
+
+.mod span{
+  display:block;
+  color:#7cff6f;
+  font-weight:bold;
+  margin-bottom:4px;
+}
+
 .footer-card{
   margin-top:22px;
   display:flex;
@@ -159,38 +185,13 @@ h1{
   background:rgba(17,34,22,.85);
 }
 
-.brand{
-  color:#7cff6f;
-  font-weight:bold;
-}
-
-.small{
-  color:#dce8dc;
-  font-size:14px;
-}
-
-.loading,.error{
-  margin-top:25px;
-  padding:18px;
-  border-radius:16px;
-  text-align:center;
-}
-
-.loading{
-  background:rgba(76,175,80,.12);
-  color:#caffd0;
-}
-
-.error{
-  display:none;
-  background:rgba(255,80,80,.13);
-  color:#ffb7b7;
-}
+.brand{color:#7cff6f;font-weight:bold}
+.small{color:#dce8dc;font-size:14px}
 
 @media(max-width:650px){
-  .container{padding:24px}
+  .container{padding:22px}
   h1{font-size:36px}
-  .logo{width:210px}
+  .logo{width:230px}
   .row{grid-template-columns:1fr}
   .value{text-align:left}
   .footer-card{flex-direction:column;text-align:center}
@@ -207,7 +208,7 @@ h1{
     <h1>Dumax FS25</h1>
     <p class="subtitle">Statistiques en direct du serveur Farming Simulator 25 RP</p>
 
-    <div class="online">
+    <div class="status-pill">
       <span class="dot"></span>
       <span id="serverState">Chargement...</span>
     </div>
@@ -216,13 +217,13 @@ h1{
   </div>
 
   <div id="loading" class="loading">Chargement des données du serveur...</div>
-  <div id="error" class="error">Impossible de charger les données XML via le proxy.</div>
+  <div id="error" class="error">Impossible de charger les données du serveur.</div>
 
   <div class="stats" id="stats" style="display:none;">
     <div class="card">
       <div class="card-title">Joueurs en ligne</div>
       <div class="card-value" id="playersOnline">-</div>
-      <div class="card-sub" id="playersMax">-</div>
+      <div class="card-sub" id="playersCapacity">-</div>
     </div>
 
     <div class="card">
@@ -247,6 +248,11 @@ h1{
     <div id="details"></div>
   </div>
 
+  <div class="panel" id="modsPanel" style="display:none;">
+    <h2>Mods installés</h2>
+    <div class="mods-grid" id="mods"></div>
+  </div>
+
   <div class="footer-card">
     <div>
       <div class="brand">🚜 Dumax FS25 RP</div>
@@ -261,131 +267,115 @@ h1{
 </div>
 
 <script>
-const ORIGINAL_XML_URL = "http://si-12625.dg.vg:8080/feed/dedicated-server-stats.xml?code=6bqwp6ka35e99sng7izc3gly1r2h";
-const XML_URL = "https://corsproxy.io/?url=" + encodeURIComponent(ORIGINAL_XML_URL);
-
-function cleanName(name){
-  return name
-    .replace(/([A-Z])/g, " $1")
-    .replace(/_/g, " ")
-    .replace(/^./, c => c.toUpperCase())
-    .trim();
-}
-
-function getFirstText(xml, names){
-  for(const name of names){
-    const el = xml.querySelector(name);
-    if(el && el.textContent.trim()) return el.textContent.trim();
-  }
-  return "-";
-}
-
-function getByAttr(xml, attrNames){
-  for(const attr of attrNames){
-    const el = xml.querySelector("[" + attr + "]");
-    if(el) return el.getAttribute(attr);
-  }
-  return "-";
-}
-
-function countTags(xml, names){
-  for(const name of names){
-    const found = xml.querySelectorAll(name);
-    if(found.length > 0) return found.length;
-  }
-  return "-";
-}
+const XML_URL = "/.netlify/functions/xml";
 
 function addRow(label, value){
-  if(!value || value === "-" || value.length > 180) return;
-
+  if(!value || value === "-") return;
   const row = document.createElement("div");
   row.className = "row";
   row.innerHTML = `<div class="label">${label}</div><div class="value">${value}</div>`;
   document.getElementById("details").appendChild(row);
 }
 
+function getAttr(el, attr, fallback="-"){
+  return el && el.getAttribute(attr) ? el.getAttribute(attr) : fallback;
+}
+
+function formatDayTime(value){
+  if(!value || value === "-") return "-";
+  const seconds = parseInt(value,10);
+  if(isNaN(seconds)) return value;
+  const days = Math.floor(seconds / 86400000);
+  return value;
+}
+
 async function loadStats(){
   try{
     document.getElementById("error").style.display = "none";
 
-    const response = await fetch(XML_URL, { cache: "no-store" });
+    const response = await fetch(XML_URL, {cache:"no-store"});
     const text = await response.text();
 
     const parser = new DOMParser();
     const xml = parser.parseFromString(text, "application/xml");
 
-    const parseError = xml.querySelector("parsererror");
-    if(parseError) throw new Error("XML invalide");
+    if(xml.querySelector("parsererror")) throw new Error("XML invalide");
 
-    document.getElementById("details").innerHTML = "";
+    const server = xml.querySelector("Server");
+    const slots = xml.querySelector("Slots");
 
-    const serverName =
-      getFirstText(xml, ["serverName","name","server"]) !== "-"
-      ? getFirstText(xml, ["serverName","name","server"])
-      : getByAttr(xml, ["serverName","name"]);
+    const serverName = getAttr(server, "name");
+    const game = getAttr(server, "game");
+    const version = getAttr(server, "version");
+    const mapName = getAttr(server, "mapName");
+    const mapSize = getAttr(server, "mapSize");
+    const dayTime = getAttr(server, "dayTime");
 
-    const gameVersion =
-      getFirstText(xml, ["version","gameVersion"]) !== "-"
-      ? getFirstText(xml, ["version","gameVersion"])
-      : getByAttr(xml, ["version","gameVersion"]);
+    const capacity = getAttr(slots, "capacity");
+    const used = getAttr(slots, "numUsed");
 
-    const onlinePlayers =
-      getFirstText(xml, ["players","onlinePlayers","numPlayers","playerCount","playerCountOnline"]) !== "-"
-      ? getFirstText(xml, ["players","onlinePlayers","numPlayers","playerCount","playerCountOnline"])
-      : getByAttr(xml, ["numPlayers","players","onlinePlayers"]);
+    const farms = xml.querySelectorAll("Farm");
+    const mods = xml.querySelectorAll("Mod");
 
-    const maxPlayers =
-      getFirstText(xml, ["maxPlayers","capacity"]) !== "-"
-      ? getFirstText(xml, ["maxPlayers","capacity"])
-      : getByAttr(xml, ["maxPlayers","capacity"]);
-
-    const farms = countTags(xml, ["farm","farms farm"]);
-
-    document.getElementById("playersOnline").textContent = onlinePlayers;
-    document.getElementById("playersMax").textContent = maxPlayers !== "-" ? "/ " + maxPlayers : "Joueurs connectés";
-    document.getElementById("farmsCount").textContent = farms;
+    document.getElementById("playersOnline").textContent = used;
+    document.getElementById("playersCapacity").textContent = "/ " + capacity;
+    document.getElementById("farmsCount").textContent = farms.length;
     document.getElementById("serverName").textContent = serverName;
-    document.getElementById("gameVersion").textContent = gameVersion;
-
+    document.getElementById("gameVersion").textContent = version;
     document.getElementById("serverState").textContent = "Serveur en ligne";
 
+    const details = document.getElementById("details");
+    details.innerHTML = "";
+
     addRow("Nom du serveur", serverName);
-    addRow("Version du jeu", gameVersion);
-    addRow("Joueurs en ligne", maxPlayers !== "-" ? onlinePlayers + " / " + maxPlayers : onlinePlayers);
-    addRow("Nombre de fermes", farms);
+    addRow("Jeu", game);
+    addRow("Version du jeu", version);
+    addRow("Joueurs en ligne", used + " / " + capacity);
+    addRow("Nombre de fermes", farms.length);
+    addRow("Carte", mapName);
+    addRow("Taille de carte", mapSize);
+    addRow("Temps serveur", dayTime);
+    addRow("Mods actifs", mods.length);
 
-    const used = new Set();
+    const activePlayers = Array.from(xml.querySelectorAll("Player"))
+      .map(p => ({
+        name: p.textContent.trim(),
+        used: p.getAttribute("isUsed"),
+        admin: p.getAttribute("isAdmin"),
+        uptime: p.getAttribute("uptime")
+      }))
+      .filter(p => p.used === "true");
 
-    Array.from(xml.getElementsByTagName("*")).forEach(el => {
-      const tag = el.tagName;
-      const value = el.textContent.trim();
+    if(activePlayers.length){
+      addRow("Joueurs connectés", activePlayers.map(p => p.name).join(", "));
+    }else{
+      addRow("Joueurs connectés", "Aucun joueur connecté");
+    }
 
-      if(el.children.length === 0 && value && value.length < 120){
-        const key = tag + value;
-        if(!used.has(key)){
-          used.add(key);
-          addRow(cleanName(tag), value);
-        }
-      }
+    const ownedFarmlands = Array.from(xml.querySelectorAll("Farmland"))
+      .filter(f => f.getAttribute("owner") && f.getAttribute("owner") !== "0");
 
-      Array.from(el.attributes || []).forEach(attr => {
-        if(attr.value && attr.value.length < 120){
-          const key = attr.name + attr.value;
-          if(!used.has(key)){
-            used.add(key);
-            addRow(cleanName(attr.name), attr.value);
-          }
-        }
-      });
+    addRow("Parcelles possédées", ownedFarmlands.length);
+
+    const modsBox = document.getElementById("mods");
+    modsBox.innerHTML = "";
+
+    mods.forEach(mod => {
+      const div = document.createElement("div");
+      div.className = "mod";
+      div.innerHTML = `
+        <span>${getAttr(mod, "name")}</span>
+        Version ${getAttr(mod, "version")} — ${getAttr(mod, "author")}
+      `;
+      modsBox.appendChild(div);
     });
 
-    const now = new Date();
-    document.getElementById("lastUpdate").textContent = now.toLocaleString("fr-FR");
+    document.getElementById("lastUpdate").textContent = new Date().toLocaleString("fr-FR");
 
     document.getElementById("loading").style.display = "none";
     document.getElementById("stats").style.display = "grid";
     document.getElementById("detailsPanel").style.display = "block";
+    document.getElementById("modsPanel").style.display = "block";
 
   }catch(e){
     document.getElementById("loading").style.display = "none";
