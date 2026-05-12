@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dumax FS25 - Dashboard</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  min-height:100vh;
+  font-family:Arial, sans-serif;
+  color:white;
+  background:
+    linear-gradient(rgba(5,12,7,.82),rgba(5,12,7,.92)),
+    radial-gradient(circle at top,rgba(88,213,104,.35),transparent 35%),
+    #071008;
+  padding:28px;
+}
+
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:38px;
+  border-radius:26px;
+  border:1px solid rgba(125,255,138,.22);
+  background:rgba(8,18,12,.88);
+  box-shadow:0 25px 90px rgba(0,0,0,.7);
+}
+
+.header{
+  text-align:center;
+  margin-bottom:35px;
+}
+
+.logo{
+  width:260px;
+  max-width:80%;
+  height:auto;
+  object-fit:contain;
+  margin-bottom:18px;
+  filter:drop-shadow(0 0 28px rgba(88,213,104,.45));
+}
+
+h1{
+  font-size:54px;
+  color:#7cff6f;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  margin-bottom:10px;
+}
+
+.subtitle{
+  color:#dce8dc;
+  font-size:18px;
+  text-transform:uppercase;
+}
+
+.online{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  margin-top:22px;
+  padding:10px 20px;
+  border-radius:999px;
+  background:rgba(76,175,80,.13);
+  color:#7cff6f;
+  font-weight:bold;
+}
+
+.dot{
+  width:12px;
+  height:12px;
+  background:#7cff6f;
+  border-radius:50%;
+  box-shadow:0 0 16px #7cff6f;
+}
+
+.refresh{
+  margin-top:18px;
+  color:#cfd8cf;
+  font-size:14px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:18px;
+  margin-top:35px;
+}
+
+.card{
+  min-height:140px;
+  padding:24px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.10);
+  background:linear-gradient(145deg,rgba(25,42,29,.9),rgba(8,15,10,.95));
+  box-shadow:inset 0 0 30px rgba(125,255,138,.035);
+}
+
+.card-title{
+  color:#e8f5e8;
+  font-size:14px;
+  font-weight:bold;
+  text-transform:uppercase;
+  margin-bottom:15px;
+}
+
+.card-value{
+  font-size:32px;
+  font-weight:bold;
+  color:#7cff6f;
+}
+
+.card-sub{
+  margin-top:6px;
+  color:#d1d8d1;
+  font-size:15px;
+}
+
+.panel{
+  margin-top:28px;
+  padding:25px;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(10,24,16,.86);
+}
+
+.panel h2{
+  color:#7cff6f;
+  font-size:21px;
+  margin-bottom:18px;
+  text-transform:uppercase;
+}
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  padding:11px 0;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.row:last-child{border-bottom:none}
+
+.label{color:#d7e0d7}
+.value{text-align:right;color:white;font-weight:bold;word-break:break-word}
+
+.footer-card{
+  margin-top:22px;
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  align-items:center;
+  padding:20px 24px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(17,34,22,.85);
+}
+
+.brand{
+  color:#7cff6f;
+  font-weight:bold;
+}
+
+.small{
+  color:#dce8dc;
+  font-size:14px;
+}
+
+.loading,.error{
+  margin-top:25px;
+  padding:18px;
+  border-radius:16px;
+  text-align:center;
+}
+
+.loading{
+  background:rgba(76,175,80,.12);
+  color:#caffd0;
+}
+
+.error{
+  display:none;
+  background:rgba(255,80,80,.13);
+  color:#ffb7b7;
+}
+
+@media(max-width:650px){
+  .container{padding:24px}
+  h1{font-size:36px}
+  .logo{width:210px}
+  .row{grid-template-columns:1fr}
+  .value{text-align:left}
+  .footer-card{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <img src="logo.png" alt="Logo Dumax FS25" class="logo">
+    <h1>Dumax FS25</h1>
+    <p class="subtitle">Statistiques en direct du serveur Farming Simulator 25 RP</p>
+
+    <div class="online">
+      <span class="dot"></span>
+      <span id="serverState">Chargement...</span>
+    </div>
+
+    <div class="refresh">↻ Mise à jour automatique toutes les 60 secondes</div>
+  </div>
+
+  <div id="loading" class="loading">Chargement des données du serveur...</div>
+  <div id="error" class="error">Impossible de charger les données XML via le proxy.</div>
+
+  <div class="stats" id="stats" style="display:none;">
+    <div class="card">
+      <div class="card-title">Joueurs en ligne</div>
+      <div class="card-value" id="playersOnline">-</div>
+      <div class="card-sub" id="playersMax">-</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Nombre de fermes</div>
+      <div class="card-value" id="farmsCount">-</div>
+      <div class="card-sub">Fermes enregistrées</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Nom du serveur</div>
+      <div class="card-value" id="serverName" style="font-size:24px;">-</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Version du jeu</div>
+      <div class="card-value" id="gameVersion">-</div>
+    </div>
+  </div>
+
+  <div class="panel" id="detailsPanel" style="display:none;">
+    <h2>Informations détaillées</h2>
+    <div id="details"></div>
+  </div>
+
+  <div class="footer-card">
+    <div>
+      <div class="brand">🚜 Dumax FS25 RP</div>
+      <div class="small">Bonne partie à tous les agriculteurs !</div>
+    </div>
+    <div class="small">
+      Dernière mise à jour<br>
+      <strong id="lastUpdate">-</strong>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const ORIGINAL_XML_URL = "http://si-12625.dg.vg:8080/feed/dedicated-server-stats.xml?code=6bqwp6ka35e99sng7izc3gly1r2h";
+const XML_URL = "https://corsproxy.io/?url=" + encodeURIComponent(ORIGINAL_XML_URL);
+
+function cleanName(name){
+  return name
+    .replace(/([A-Z])/g, " $1")
+    .replace(/_/g, " ")
+    .replace(/^./, c => c.toUpperCase())
+    .trim();
+}
+
+function getFirstText(xml, names){
+  for(const name of names){
+    const el = xml.querySelector(name);
+    if(el && el.textContent.trim()) return el.textContent.trim();
+  }
+  return "-";
+}
+
+function getByAttr(xml, attrNames){
+  for(const attr of attrNames){
+    const el = xml.querySelector("[" + attr + "]");
+    if(el) return el.getAttribute(attr);
+  }
+  return "-";
+}
+
+function countTags(xml, names){
+  for(const name of names){
+    const found = xml.querySelectorAll(name);
+    if(found.length > 0) return found.length;
+  }
+  return "-";
+}
+
+function addRow(label, value){
+  if(!value || value === "-" || value.length > 180) return;
+
+  const row = document.createElement("div");
+  row.className = "row";
+  row.innerHTML = `<div class="label">${label}</div><div class="value">${value}</div>`;
+  document.getElementById("details").appendChild(row);
+}
+
+async function loadStats(){
+  try{
+    document.getElementById("error").style.display = "none";
+
+    const response = await fetch(XML_URL, { cache: "no-store" });
+    const text = await response.text();
+
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(text, "application/xml");
+
+    const parseError = xml.querySelector("parsererror");
+    if(parseError) throw new Error("XML invalide");
+
+    document.getElementById("details").innerHTML = "";
+
+    const serverName =
+      getFirstText(xml, ["serverName","name","server"]) !== "-"
+      ? getFirstText(xml, ["serverName","name","server"])
+      : getByAttr(xml, ["serverName","name"]);
+
+    const gameVersion =
+      getFirstText(xml, ["version","gameVersion"]) !== "-"
+      ? getFirstText(xml, ["version","gameVersion"])
+      : getByAttr(xml, ["version","gameVersion"]);
+
+    const onlinePlayers =
+      getFirstText(xml, ["players","onlinePlayers","numPlayers","playerCount","playerCountOnline"]) !== "-"
+      ? getFirstText(xml, ["players","onlinePlayers","numPlayers","playerCount","playerCountOnline"])
+      : getByAttr(xml, ["numPlayers","players","onlinePlayers"]);
+
+    const maxPlayers =
+      getFirstText(xml, ["maxPlayers","capacity"]) !== "-"
+      ? getFirstText(xml, ["maxPlayers","capacity"])
+      : getByAttr(xml, ["maxPlayers","capacity"]);
+
+    const farms = countTags(xml, ["farm","farms farm"]);
+
+    document.getElementById("playersOnline").textContent = onlinePlayers;
+    document.getElementById("playersMax").textContent = maxPlayers !== "-" ? "/ " + maxPlayers : "Joueurs connectés";
+    document.getElementById("farmsCount").textContent = farms;
+    document.getElementById("serverName").textContent = serverName;
+    document.getElementById("gameVersion").textContent = gameVersion;
+
+    document.getElementById("serverState").textContent = "Serveur en ligne";
+
+    addRow("Nom du serveur", serverName);
+    addRow("Version du jeu", gameVersion);
+    addRow("Joueurs en ligne", maxPlayers !== "-" ? onlinePlayers + " / " + maxPlayers : onlinePlayers);
+    addRow("Nombre de fermes", farms);
+
+    const used = new Set();
+
+    Array.from(xml.getElementsByTagName("*")).forEach(el => {
+      const tag = el.tagName;
+      const value = el.textContent.trim();
+
+      if(el.children.length === 0 && value && value.length < 120){
+        const key = tag + value;
+        if(!used.has(key)){
+          used.add(key);
+          addRow(cleanName(tag), value);
+        }
+      }
+
+      Array.from(el.attributes || []).forEach(attr => {
+        if(attr.value && attr.value.length < 120){
+          const key = attr.name + attr.value;
+          if(!used.has(key)){
+            used.add(key);
+            addRow(cleanName(attr.name), attr.value);
+          }
+        }
+      });
+    });
+
+    const now = new Date();
+    document.getElementById("lastUpdate").textContent = now.toLocaleString("fr-FR");
+
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("stats").style.display = "grid";
+    document.getElementById("detailsPanel").style.display = "block";
+
+  }catch(e){
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("error").style.display = "block";
+    document.getElementById("serverState").textContent = "Données indisponibles";
+  }
+}
+
+loadStats();
+setInterval(loadStats, 60000);
+</script>
+
+</body>
+</html>
