@@ -356,17 +356,19 @@ function addServerRow(label, value){
   document.getElementById("serverDetails").appendChild(row);
 }
 
-function formatUptime(seconds){
-  const s = parseInt(seconds, 10);
-  if(isNaN(s)) return "-";
+function formatUptime(minutes){
+  const mins = parseInt(minutes, 10);
 
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sec = s % 60;
+  if(isNaN(mins)) return "-";
 
-  if(h > 0) return `${h}h ${m}min ${sec}s`;
-  if(m > 0) return `${m}min ${sec}s`;
-  return `${sec}s`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+
+  if(h > 0){
+    return `${h}h ${m}min`;
+  }
+
+  return `${m} min`;
 }
 
 async function loadStats(){
