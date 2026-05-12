@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dumax FS25 - Dashboard</title>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 
@@ -117,6 +118,12 @@ h1{
   color:#7cff6f;
 }
 
+.card-value.players{
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+}
+
 .card-sub{
   margin-top:6px;
   color:#d1d8d1;
@@ -222,7 +229,7 @@ h1{
   <div class="header">
     <img src="logo.png" alt="Logo Dumax FS25" class="logo">
     <h1>Dumax FS25</h1>
-    <p class="subtitle">Statistiques en direct du serveur Farming Simulator 25 RP</p>
+    <p class="subtitle">Centre de contrôle du serveur Dumax</p>
 
     <div class="status-pill">
       <span class="dot"></span>
@@ -238,8 +245,12 @@ h1{
   <div class="stats" id="stats" style="display:none;">
     <div class="card">
       <div class="card-title">Joueurs connectés</div>
-      <div class="card-value" id="playersOnline">-</div>
-      <div class="card-sub" id="playersCapacity">-</div>
+      <div class="card-value players">
+        <span id="playersOnline">-</span>
+        <span>/</span>
+        <span id="playersCapacity">-</span>
+      </div>
+      <div class="card-sub">Slots utilisés</div>
     </div>
 
     <div class="card">
@@ -253,8 +264,9 @@ h1{
     </div>
 
     <div class="card">
-      <div class="card-title">Slots max</div>
-      <div class="card-value" id="maxSlots">-</div>
+      <div class="card-title">Mods installés</div>
+      <div class="card-value" id="modsCount">-</div>
+      <div class="card-sub">Mise à jour automatique</div>
     </div>
   </div>
 
@@ -325,9 +337,9 @@ async function loadStats(){
 
     const serverName = getAttr(server, "name");
     const mapName = getAttr(server, "mapName");
-    const overviewMap = getAttr(server, "mapOverviewFilename");
     const capacity = getAttr(slots, "capacity");
     const used = getAttr(slots, "numUsed");
+    const modsCount = xml.querySelectorAll("Mod").length;
 
     const players = Array.from(xml.querySelectorAll("Player"))
       .filter(p => getAttr(p, "isUsed") === "true")
@@ -338,10 +350,10 @@ async function loadStats(){
       }));
 
     document.getElementById("playersOnline").textContent = used;
-    document.getElementById("playersCapacity").textContent = "/ " + capacity;
+    document.getElementById("playersCapacity").textContent = capacity;
     document.getElementById("serverName").textContent = serverName;
     document.getElementById("mapName").textContent = mapName;
-    document.getElementById("maxSlots").textContent = capacity;
+    document.getElementById("modsCount").textContent = modsCount;
     document.getElementById("serverState").textContent = "Serveur en ligne";
 
     const playersList = document.getElementById("playersList");
@@ -369,7 +381,7 @@ async function loadStats(){
     addServerRow("Carte utilisée", mapName);
     addServerRow("Nombre max de slots", capacity);
     addServerRow("Nombre de joueurs connectés", used);
-    addServerRow("Vue d’overview map", overviewMap);
+    addServerRow("Nombre de mods installés", modsCount);
 
     document.getElementById("lastUpdate").textContent = new Date().toLocaleString("fr-FR");
 
